@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  nginx:
+    container_name: Yanaira-nginx
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - printer-service
+    networks:
+      - yanaira-network
+
+  backend:
+    container_name: Yanaira-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=4000
+      - NODE_ENV=development
+      - PRINTER_SERVICE_URL=printer-service:50051
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./proto:/app/proto
+    command: npm run start:dev
+    depends_on:
+      - printer-service
+    networks:
+      - yanaira-network
+
+  printer-service:
+    container_name: Yanaira-printer
+    build:
+      context: ./printer-service
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./printer-service:/app
+    networks:
+      - yanaira-network
+
+networks:
+  yanaira-network:
+    driver: bridge

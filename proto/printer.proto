@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package printer;
+
+// Printer service for sending text to the thermal printer.
+service PrinterService {
+  // Sends a text string to be printed.
+  rpc PrintText (PrintRequest) returns (PrintResponse);
+}
+
+message PrintRequest {
+  string text = 1;
+}
+
+message PrintResponse {
+  bool   success = 1;
+  string message = 2;
+}
